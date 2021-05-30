@@ -24,7 +24,10 @@ echo \"streamDaytime\": \"$streamDaytime\" >> data.json
 echo } >> data.json
 echo "Uploading data.json"
 if [[ $PROTOCOL == "S3" ]] ; then
-        $AWS_CLI_DIR/aws s3 cp data.json s3://$S3_BUCKET$IMGDIR --acl $S3_ACL &
+        if [[ ! -z "$S3_ENDPOINT" ]]; then
+          endpoint="--endpoint-url $S3_ENDPOINT"
+        fi
+        $AWS_CLI_DIR/aws s3 $endpoint cp data.json s3://$S3_BUCKET$IMGDIR --acl $S3_ACL &
 elif [[ $PROTOCOL == "local" ]] ; then
 	cp data.json $IMGDIR &
 else

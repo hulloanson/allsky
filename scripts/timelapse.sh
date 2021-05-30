@@ -46,7 +46,10 @@ ffmpeg -y -f image2 \
 
 if [ "$UPLOAD_VIDEO" = true ] ; then
         if [[ "$PROTOCOL" == "S3" ]] ; then
-                $AWS_CLI_DIR/aws s3 cp images/$1/allsky-$1.mp4 s3://$S3_BUCKET$MP4DIR --acl $S3_ACL &
+                if [[ ! -z "$S3_ENDPOINT" ]]; then
+                  endpoint="--endpoint-url $S3_ENDPOINT"
+                fi
+                $AWS_CLI_DIR/aws s3 $endpoint cp images/$1/allsky-$1.mp4 s3://$S3_BUCKET$MP4DIR --acl $S3_ACL &
 	elif [[ $PROTOCOL == "local" ]] ; then
                 cp $FILENAME-resize.$EXTENSION /var/www/html/$MP4DIR &
         else

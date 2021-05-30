@@ -20,7 +20,10 @@ fi
 echo -e "Uploading Keogram\n"
 KEOGRAM="$ALLSKY_HOME/images/$1/keogram/keogram-$1.$EXTENSION"
 if [[ $PROTOCOL == "S3" ]] ; then
-        $AWS_CLI_DIR/aws s3 cp $KEOGRAM s3://$S3_BUCKET$KEOGRAM_DIR --acl $S3_ACL &
+        if [[ ! -z "$S3_ENDPOINT" ]]; then
+          endpoint="--endpoint-url $S3_ENDPOINT"
+        fi
+        $AWS_CLI_DIR/aws s3 $endpoint cp $KEOGRAM s3://$S3_BUCKET$KEOGRAM_DIR --acl $S3_ACL &
 elif [[ $PROTOCOL == "local" ]] ; then
 	cp $KEOGRAM $KEOGRAM_DIR &
 else
@@ -32,7 +35,10 @@ echo -e "\n"
 echo -e "Uploading Startrails\n"
 STARTRAILS="$ALLSKY_HOME/images/$1/startrails/startrails-$1.$EXTENSION"
 if [[ $PROTOCOL == "S3" ]] ; then
-        $AWS_CLI_DIR/aws s3 cp $STARTRAILS s3://$S3_BUCKET$STARTRAILS_DIR --acl $S3_ACL &
+        if [[ ! -z "$S3_ENDPOINT" ]]; then
+          endpoint="--endpoint-url $S3_ENDPOINT"
+        fi
+        $AWS_CLI_DIR/aws s3 $endpoint cp $STARTRAILS s3://$S3_BUCKET$STARTRAILS_DIR --acl $S3_ACL &
 elif [[ $PROTOCOL == "local" ]] ; then
 	cp $STARTRAILS $STARTRAILS_DIR &
 else
@@ -44,7 +50,10 @@ echo -e "\n"
 echo -e "Uploading Timelapse\n"
 TIMELAPSE="$ALLSKY_HOME/images/$1/allsky-$1.mp4"
 if [[ "$PROTOCOL" == "S3" ]] ; then
-        $AWS_CLI_DIR/aws s3 cp $TIMELAPSE s3://$S3_BUCKET$MP4DIR --acl $S3_ACL &
+        if [[ ! -z "$S3_ENDPOINT" ]]; then
+          endpoint="--endpoint-url $S3_ENDPOINT"
+        fi
+        $AWS_CLI_DIR/aws s3 $endpoint cp $TIMELAPSE s3://$S3_BUCKET$MP4DIR --acl $S3_ACL &
 elif [[ $PROTOCOL == "local" ]] ; then
 	cp $TIMELAPSE $MP4DIR &
 else

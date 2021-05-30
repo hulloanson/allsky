@@ -38,7 +38,10 @@ if [[ $KEOGRAM == "true" ]]; then
         if [[ $UPLOAD_KEOGRAM == "true" ]] ; then
                 OUTPUT="$ALLSKY_HOME/images/$LAST_NIGHT/keogram/keogram-$LAST_NIGHT.$EXTENSION"
                 if [[ $PROTOCOL == "S3" ]] ; then
-                        $AWS_CLI_DIR/aws s3 cp $OUTPUT s3://$S3_BUCKET$KEOGRAM_DIR --acl $S3_ACL &
+                        if [[ ! -z "$S3_ENDPOINT" ]]; then
+                          endpoint="--endpoint-url $S3_ENDPOINT"
+                        fi
+                        $AWS_CLI_DIR/aws s3 $endpoint cp $OUTPUT s3://$S3_BUCKET$KEOGRAM_DIR --acl $S3_ACL &
 		elif [[ $PROTOCOL == "local" ]] ; then
                 	cp $OUTPUT $KEOGRAM_DIR &
                 else
@@ -57,7 +60,10 @@ if [[ $STARTRAILS == "true" ]]; then
         if [[ $UPLOAD_STARTRAILS == "true" ]] ; then
                 OUTPUT="$ALLSKY_HOME/images/$LAST_NIGHT/startrails/startrails-$LAST_NIGHT.$EXTENSION"
                 if [[ $PROTOCOL == "S3" ]] ; then
-                        $AWS_CLI_DIR/aws s3 cp $OUTPUT s3://$S3_BUCKET$STARTRAILS_DIR --acl $S3_ACL &
+                        if [[ ! -z "$S3_ENDPOINT" ]]; then
+                          endpoint="--endpoint-url $S3_ENDPOINT"
+                        fi
+                        $AWS_CLI_DIR/aws s3 $endpoint cp $OUTPUT s3://$S3_BUCKET$STARTRAILS_DIR --acl $S3_ACL &
                 elif [[ $PROTOCOL == "local" ]] ; then
                         cp $OUTPUT $STARTRAILS_DIR &
 		else
