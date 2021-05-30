@@ -31,7 +31,7 @@ S3_ACL='private'
 # Remove comment to customize S3 endpoint
 # S3_ENDPOINT="https://$HOST:9000"
 
-if [[ -z "$S3_ENDPOINT" ]]; then
+if [[ ! -z "$S3_ENDPOINT" ]]; then
   AWS_CMD="$AWS_CLI_DIR/aws --endpoint-url $S3_ENDPOINT"
 else
   AWS_CMD="$AWS_CLI_DIR/aws"

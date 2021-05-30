@@ -55,9 +55,6 @@ if [ "$UPLOAD_IMG" = true ] ; then
 	echo -e "Uploading\n"
 	echo -e "Uploading $FILENAME-resize.$EXTENSION \n" >> log.txt
        if [[ $PROTOCOL == "S3" ]] ; then
-                if [[ ! -z "$S3_ENDPOINT" ]]; then
-                  endpoint="--endpoint-url $S3_ENDPOINT"
-                fi
                 $AWS_CMD s3 cp $FILENAME-resize.$EXTENSION s3://$S3_BUCKET$IMGDIR --acl $S3_ACL &
         elif [[ $PROTOCOL == "local" ]] ; then
 		cp $FILENAME-resize.$EXTENSION $IMGDIR &
