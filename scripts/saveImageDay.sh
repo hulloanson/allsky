@@ -58,7 +58,7 @@ if [ "$UPLOAD_IMG" = true ] ; then
                 if [[ ! -z "$S3_ENDPOINT" ]]; then
                   endpoint="--endpoint-url $S3_ENDPOINT"
                 fi
-                $AWS_CLI_DIR/aws s3 $endpoint cp $FILENAME-resize.$EXTENSION s3://$S3_BUCKET$IMGDIR --acl $S3_ACL &
+                $AWS_CMD s3 cp $FILENAME-resize.$EXTENSION s3://$S3_BUCKET$IMGDIR --acl $S3_ACL &
         elif [[ $PROTOCOL == "local" ]] ; then
 		cp $FILENAME-resize.$EXTENSION $IMGDIR &
 	else

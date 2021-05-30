@@ -9,20 +9,18 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-if [ $# -lt 1 ]
-  then
-    echo -en "${RED}You need to pass a day argument\n"
-        echo -en "    ex: timelapse.sh 20180119${NC}\n"
-        exit 3
-fi
-
 echo -en "* ${GREEN}Creating symlinks to generate timelapse${NC}\n"
-mkdir $ALLSKY_HOME/images/$1/sequence/
+id="$( date +%Y%m%d%H%M%S )"
+mkdir -p $ALLSKY_HOME/images/$id/sequence/
 
 # find images, make symlinks sequentially and start avconv to build mp4; upload mp4 and move directory
-find "$ALLSKY_HOME/images/$1" -name "*.$EXTENSION" -size 0 -delete
-ls -rt $ALLSKY_HOME/images/$1/*.$EXTENSION |
-gawk 'BEGIN{ a=1 }{ printf "ln -sv %s $ALLSKY_HOME/images/'$1'/sequence/%04d.'$EXTENSION'\n", $0, a++ }' |
+images="$( find "$ALLSKY_HOME/images" -type f -iname 'image-*.jpg' -mmin -15 -size +0 | grep -v thumbnails | sort )"
+if [[ -z "$images" ]]; then
+    echo "No image to generate timelapse"
+    exit 
+fi
+echo -n $images |
+gawk 'BEGIN{ RS=" "; a=1 }{ printf "ln -sv %s $ALLSKY_HOME/images/'$id'/sequence/%04d.'$EXTENSION'\n", $0, a++ }' |
 bash
 
 SCALE=""
@@ -36,28 +34,28 @@ fi
 
 ffmpeg -y -f image2 \
 	-r $FPS \
-	-i images/$1/sequence/%04d.$EXTENSION \
+	-i images/$id/sequence/%04d.$EXTENSION \
 	-vcodec libx264 \
 	-b:v 2000k \
 	-pix_fmt yuv420p \
 	-movflags +faststart \
 	$SCALE \
-	images/$1/allsky-$1.mp4
+	images/$id/allsky-$id.mp4
 
 if [ "$UPLOAD_VIDEO" = true ] ; then
         if [[ "$PROTOCOL" == "S3" ]] ; then
                 if [[ ! -z "$S3_ENDPOINT" ]]; then
                   endpoint="--endpoint-url $S3_ENDPOINT"
                 fi
-                $AWS_CMD s3 cp images/$1/allsky-$1.mp4 s3://$S3_BUCKET$MP4DIR --acl $S3_ACL &
+                $AWS_CMD $endpoint --profile default s3 cp images/$id/allsky-$id.mp4 s3://$S3_BUCKET${MP4DIR}timelapse-current.mp4 --acl $S3_ACL
 	elif [[ $PROTOCOL == "local" ]] ; then
                 cp $FILENAME-resize.$EXTENSION /var/www/html/$MP4DIR &
         else
-                lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$MP4DIR" -e "set net:max-retries 1; put images/$1/allsky-$1.mp4; bye" &
+                lftp "$PROTOCOL"://"$USER":"$PASSWORD"@"$HOST":"$MP4DIR" -e "set net:max-retries 1; put images/$id/allsky-$id.mp4; bye" &
         fi
 fi
 
 echo -en "* ${GREEN}Deleting sequence${NC}\n"
-rm -rf $ALLSKY_HOME/images/$1/sequence
+rm -rf $ALLSKY_HOME/images/$id
 
 echo -en "* ${GREEN}Timelapse was created${NC}\n"

@@ -27,7 +27,7 @@ if [[ $PROTOCOL == "S3" ]] ; then
         if [[ ! -z "$S3_ENDPOINT" ]]; then
           endpoint="--endpoint-url $S3_ENDPOINT"
         fi
-        $AWS_CLI_DIR/aws s3 $endpoint cp data.json s3://$S3_BUCKET$IMGDIR --acl $S3_ACL &
+        $AWS_CMD s3 cp data.json s3://$S3_BUCKET$IMGDIR --acl $S3_ACL &
 elif [[ $PROTOCOL == "local" ]] ; then
 	cp data.json $IMGDIR &
 else
